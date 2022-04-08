@@ -1,6 +1,7 @@
 defmodule MyList do
   def sum([]), do: 0
   def sum([ head | tail]), do: head + sum(tail)
+  def info(), do: IO.puts "Use MyList.sum [n1, n2, n3, ...]"
 end
 
-IO.puts MyList.sum [1,2,3,4,5,6,7,8,9]
+IO.puts MyList.info()
