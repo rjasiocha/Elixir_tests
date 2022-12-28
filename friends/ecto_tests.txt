@@ -1,0 +1,58 @@
+# service postgresql start
+# service postgresql status
+
+# rm -rf _build
+
+
+mix new friends --sup
+# configure drivers in mix.exs, if MySQL => {:myxql, ">= 0.0.0"} 
+# if MySQL edit lib/friends/repo.ex end change adapter to Ecto.Adapters.MyXQL
+mix deps.get
+mix ecto.gen.repo -r Friends.Repo
+# configure db connection in config/config.exs
+# check Friends.Repo module defined in lib/friends/repo.ex
+# setup the Friends.Repo as a supervisor within the application's supervision tree, which we can do in lib/friends/application.ex
+def start(_type, _args) do
+  children = [
+    Friends.Repo,
+  ]
+# in config/config.exs, add this line at the buttom:
+config :friends, ecto_repos: [Friends.Repo]  
+
+
+mix ecto.drop
+mix ecto.create
+mix ecto.migrate
+
+iex -S mix
+
+people = [
+  %Friends.Person{first_name: "Ryan", last_name: "Bigg", age: 28},
+  %Friends.Person{first_name: "John", last_name: "Smith", age: 27},
+  %Friends.Person{first_name: "Jane", last_name: "Smith", age: 26},
+]
+Enum.each(people, fn (person) -> Friends.Repo.insert(person) end)
+
+
+Friends.Person |> Ecto.Query.first
+
+Friends.Person |> Ecto.Query.first |> Friends.Repo.one
+
+Friends.Person |> Ecto.Query.last |> Friends.Repo.one
+
+Friends.Person |> Friends.Repo.all
+
+Friends.Person |> Friends.Repo.get(1)
+
+Friends.Person |> Friends.Repo.get_by(first_name: "Ryan")
+
+Friends.Person |> Ecto.Query.where(last_name: "Smith") |> Friends.Repo.all 		#=> ????????????????
+
+
+person = Friends.Person |> Ecto.Query.first |> Friends.Repo.one
+changeset = Friends.Person.changeset(person, %{age: 29})
+Friends.Repo.update(changeset)
+
+
+person = Friends.Repo.get(Friends.Person, 1)
+Friends.Repo.delete(person)
