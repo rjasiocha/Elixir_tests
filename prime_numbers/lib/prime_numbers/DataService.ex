@@ -8,18 +8,20 @@ defmodule DataService do
       :true
     end
   end
-  
+
   def insert(value) do
     if isInPrimes(value) == :false and value < 2147483648 do
-      prime = %PrimeNumbers.Prime{prime_number: value}
-      PrimeNumbers.Repo.insert(prime)
+      prime = %PrimeNumbers.Prime{}
+      changeset = PrimeNumbers.Prime.changeset(prime, %{prime_number: value})
+      PrimeNumbers.Repo.insert(changeset)
     end
   end
-  
+
   def info() do
     IO.puts "DataService.isInPrimes(value)"
     IO.puts "DataService.insert(value)"
   end
+
 end
 
 
